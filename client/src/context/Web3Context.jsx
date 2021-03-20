@@ -5,10 +5,11 @@ import SimpleStorageContract from "contracts/Voting.json";
 const Web3Context = createContext(null);
 
 const Web3Provider = ({ children }) => {
-  const [storageValue, setStorageValue] = useState(0);
   const [web3, setWeb3] = useState({ eth: {} });
   const [accounts, setAccounts] = useState([]);
   const [contract, setContracts] = useState({ methods: {} });
+  const [workflow, setWorkflow] = useState(0);
+  const [owner, setOwner] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -32,7 +33,8 @@ const Web3Provider = ({ children }) => {
         setWeb3(web3);
         setAccounts(accounts);
         setContracts(contract);
-        setStorageValue(await contract.methods.get().call());
+        setWorkflow(await contract.methods._workflow().call());
+        setOwner(await contract.methods.owner().call());
       } catch (error) {
         // Catch any errors for any of the above operations.
         alert(
@@ -43,18 +45,14 @@ const Web3Provider = ({ children }) => {
     })();
   }, []);
 
-  const updateStorageValue = (val) => {
-    setStorageValue(val);
-  };
-
   return (
     <Web3Context.Provider
       value={{
         web3,
         accounts,
         contract,
-        storageValue,
-        updateStorageValue,
+        workflow,
+        owner,
       }}
     >
       {children}

@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <div>
-            <div className="text-gray-600">&copy; Truffle NextJS</div>
+            <div className="text-gray-600">&copy; Voting Dapp</div>
           </div>
 
           <div className="flex items-center -mx-2">
