@@ -11,16 +11,33 @@ import {
 import WorkflowStatus from "workflowStatus";
 
 function App() {
-  const { web3, accounts, workflow, owner } = useContext(Web3Context);
+  const { web3, accounts, workflow, owner, votersAddress } = useContext(
+    Web3Context
+  );
 
   const componentWorkflow = (param) => {
     switch (param) {
       case "RegisteringVoters":
-        return owner === accounts[0] ? <RegisteringVoters /> : <Forbidden />;
+        return owner === accounts[0] ? (
+          <RegisteringVoters />
+        ) : (
+          <Forbidden
+            content="Connectez-vous avec l'adresse du popriétaire du contrat pour démarrer la
+        période de proposition"
+          />
+        );
       case "ProposalsRegistrationStarted":
-        return <ProposalStart />;
+        return votersAddress.indexOf(accounts[0]) !== -1 ? (
+          <ProposalStart />
+        ) : (
+          <Forbidden content="Vous n'êtes pas autorisé à enregistrer des propositions. Veuillez utiliser une adresse qui fait partie de la liste des adresses autorisées" />
+        );
       case "ProposalsRegistrationEnded":
-        return <ProposalEnd />;
+        return votersAddress.indexOf(accounts[0]) !== -1 ? (
+          <ProposalEnd />
+        ) : (
+          <Forbidden content="Vous n'êtes pas autorisé à voter. Veuillez utiliser une adresse qui fait partie de la liste des adresses autorisées" />
+        );
       case "VotingSessionStarted":
         return <VotingStart />;
       case "VotingSessionEnded":

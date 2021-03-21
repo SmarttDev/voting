@@ -1,12 +1,18 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import Web3Context from "context/Web3Context";
 import Modal from "components/Modal";
 import Proposal from "components/Proposal";
 
 const ProposalStart = () => {
-  const { contract, accounts, setWorkflow, owner } = useContext(Web3Context);
+  const {
+    contract,
+    accounts,
+    setWorkflow,
+    owner,
+    proposalList,
+    setProposalList,
+  } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
-  const [proposal, setProposal] = useState([]);
 
   contract.events
     .ProposalRegistered()
@@ -22,20 +28,6 @@ const ProposalStart = () => {
     })
     .on("error", console.error);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setProposal([1, 2]);
-      } catch (error) {
-        // Catch any errors for any of the above operations.
-        alert(
-          `Failed to load web3, accounts, or contract. Check console for details.`
-        );
-        console.error(error);
-      }
-    })();
-  }, [contract]);
-
   const submitRegisterProposal = async (e) => {
     e.preventDefault();
 
@@ -45,7 +37,7 @@ const ProposalStart = () => {
       .send({ from: accounts[0] }, async (error, tx) => {
         if (tx) {
           e.target.reset();
-          setProposal([...proposal, newProposal]);
+          setProposalList([...proposalList, newProposal]);
         }
         if (error) {
           console.log(error);
@@ -99,7 +91,7 @@ const ProposalStart = () => {
 
       {showModal && (
         <Modal
-          content={<Proposal content={proposal} />}
+          content={<Proposal content={proposalList} />}
           title="Liste des propositions"
           setShowModal={setShowModal}
         />

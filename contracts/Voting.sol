@@ -73,8 +73,17 @@ contract Voting is Ownable {
         emit VoterRegistered(_address);
     }
 
-    function getVotersAddress() public view returns (address[] memory) {
+    function getVotersAddress()
+        public
+        view
+        onlyOwner
+        returns (address[] memory)
+    {
         return _votersAddress;
+    }
+
+    function getProposalList() public view returns (Proposal[] memory) {
+        return _proposallist;
     }
 
     /**

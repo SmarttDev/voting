@@ -10,6 +10,8 @@ const Web3Provider = ({ children }) => {
   const [contract, setContracts] = useState({ methods: {} });
   const [workflow, setWorkflow] = useState(0);
   const [owner, setOwner] = useState(0);
+  const [votersAddress, setVotersAddress] = useState([]);
+  const [proposalList, setProposalList] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -35,6 +37,8 @@ const Web3Provider = ({ children }) => {
         setContracts(contract);
         setWorkflow(await contract.methods._workflow().call());
         setOwner(await contract.methods.owner().call());
+        setVotersAddress(await contract.methods.getVotersAddress().call());
+        setProposalList(await contract.methods.getProposalList().call());
       } catch (error) {
         // Catch any errors for any of the above operations.
         alert(
@@ -54,6 +58,10 @@ const Web3Provider = ({ children }) => {
         workflow,
         setWorkflow,
         owner,
+        votersAddress,
+        setVotersAddress,
+        proposalList,
+        setProposalList,
       }}
     >
       {children}
