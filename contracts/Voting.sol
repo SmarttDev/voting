@@ -30,6 +30,7 @@ contract Voting is Ownable {
     }
 
     mapping(address => Voter) public _voterlist;
+    address[] public _votersAddress;
 
     Proposal[] public _proposallist;
     WorkflowStatus public _workflow;
@@ -68,7 +69,12 @@ contract Voting is Ownable {
             "This address is already registered"
         );
         _voterlist[_address].isRegistered = true;
+        _votersAddress.push(_address);
         emit VoterRegistered(_address);
+    }
+
+    function getVotersAddress() public view returns (address[] memory) {
+        return _votersAddress;
     }
 
     /**

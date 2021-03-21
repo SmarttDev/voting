@@ -11,24 +11,14 @@ import {
 import WorkflowStatus from "workflowStatus";
 
 function App() {
-  const { web3, contract, accounts, workflow, owner } = useContext(Web3Context);
+  const { web3, accounts, workflow, owner } = useContext(Web3Context);
 
   const componentWorkflow = (param) => {
     switch (param) {
       case "RegisteringVoters":
-        return owner === accounts[0] ? (
-          <RegisteringVoters contract={contract} accounts={accounts} />
-        ) : (
-          <Forbidden />
-        );
+        return owner === accounts[0] ? <RegisteringVoters /> : <Forbidden />;
       case "ProposalsRegistrationStarted":
-        return (
-          <ProposalStart
-            owner={owner}
-            contract={contract}
-            accounts={accounts}
-          />
-        );
+        return <ProposalStart />;
       case "ProposalsRegistrationEnded":
         return <ProposalEnd />;
       case "VotingSessionStarted":
@@ -51,7 +41,13 @@ function App() {
               Voting Dapp
             </h1>
             <div className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-3xl sm:mx-auto md:mt-5 md:text-xl">
-              {componentWorkflow(WorkflowStatus[workflow])}
+              {accounts.length ? (
+                componentWorkflow(WorkflowStatus[workflow])
+              ) : (
+                <p className="text-indigo-600 font-bold">
+                  Veuillez vous connecter pour utiliser l'application
+                </p>
+              )}
             </div>
           </section>
         </>

@@ -52,6 +52,7 @@ const Web3Provider = ({ children }) => {
         accounts,
         contract,
         workflow,
+        setWorkflow,
         owner,
       }}
     >

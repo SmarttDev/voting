@@ -1,23 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import Web3Context from "context/Web3Context";
 import Modal from "components/Modal";
+import VotersAddress from "components/VotersAddress";
 
-const RegisteringVoters = ({ contract, accounts }) => {
+const RegisteringVoters = () => {
+  const { contract, accounts, setWorkflow } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
+  const [votersAddress, setVotersAddress] = useState([]);
+
+  contract.events
+    .VoterRegistered()
+    .on("data", async (event) => {
+      console.log(event.returnValues);
+    })
+    .on("error", console.error);
+
+  contract.events
+    .WorkflowStatusChange()
+    .on("data", async (event) => {
+      setWorkflow(event.returnValues.newStatus);
+    })
+    .on("error", console.error);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setVotersAddress(await contract.methods.getVotersAddress().call());
+      } catch (error) {
+        // Catch any errors for any of the above operations.
+        alert(
+          `Failed to load web3, accounts, or contract. Check console for details.`
+        );
+        console.error(error);
+      }
+    })();
+  }, [contract]);
+
   const submitRegisterVoter = async (e) => {
     e.preventDefault();
+    const addressVoter = e.target.addressVoter.value;
 
-    // Stores a given value, 5 by default.
     await contract.methods
-      .RegisterVoter(e.target.addressVoter.value)
+      .RegisterVoter(addressVoter)
       .send({ from: accounts[0] }, async (error, tx) => {
         if (tx) {
           e.target.reset();
+          setVotersAddress([...votersAddress, addressVoter]);
+        }
+        if (error) {
+          console.log(error);
         }
       });
   };
-
-  const modalTitle = "Title voters";
-  const modalContent = "Modal content voters";
 
   return (
     <>
@@ -39,6 +73,7 @@ const RegisteringVoters = ({ contract, accounts }) => {
           Valider
         </button>
       </form>
+
       <div className="flex justify-center space-x-4 mt-20">
         <button
           type="button"
@@ -59,7 +94,13 @@ const RegisteringVoters = ({ contract, accounts }) => {
           Démarrer les propositions
         </button>
       </div>
-      {showModal && <Modal content={modalContent} title={modalTitle} />}
+      {showModal && (
+        <Modal
+          content={<VotersAddress content={votersAddress} />}
+          title="Liste des votants"
+          setShowModal={setShowModal}
+        />
+      )}
     </>
   );
 };

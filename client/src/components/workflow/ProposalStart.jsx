@@ -1,21 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import Web3Context from "context/Web3Context";
 import Modal from "components/Modal";
+import Proposal from "components/Proposal";
 
-const ProposalStart = ({ owner, contract, accounts }) => {
+const ProposalStart = () => {
+  const { contract, accounts, setWorkflow, owner } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
+  const [proposal, setProposal] = useState([]);
+
+  contract.events
+    .ProposalRegistered()
+    .on("data", async (event) => {
+      console.log(event.returnValues);
+    })
+    .on("error", console.error);
+
+  contract.events
+    .WorkflowStatusChange()
+    .on("data", async (event) => {
+      setWorkflow(event.returnValues.newStatus);
+    })
+    .on("error", console.error);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setProposal([1, 2]);
+      } catch (error) {
+        // Catch any errors for any of the above operations.
+        alert(
+          `Failed to load web3, accounts, or contract. Check console for details.`
+        );
+        console.error(error);
+      }
+    })();
+  }, [contract]);
+
   const submitRegisterProposal = async (e) => {
-    // Stores a given value, 5 by default.
+    e.preventDefault();
+
+    const newProposal = e.target.proposal.value;
     await contract.methods
-      .RegisterProposal(e.target.proposal.value)
+      .RegisterProposal(newProposal)
       .send({ from: accounts[0] }, async (error, tx) => {
         if (tx) {
           e.target.reset();
+          setProposal([...proposal, newProposal]);
+        }
+        if (error) {
+          console.log(error);
         }
       });
   };
-
-  const modalTitle = "Title proposal";
-  const modalContent = "Modal content proposal";
 
   return (
     <>
@@ -61,7 +97,13 @@ const ProposalStart = ({ owner, contract, accounts }) => {
         )}
       </div>
 
-      {showModal && <Modal content={modalContent} title={modalTitle} />}
+      {showModal && (
+        <Modal
+          content={<Proposal content={proposal} />}
+          title="Liste des propositions"
+          setShowModal={setShowModal}
+        />
+      )}
     </>
   );
 };
