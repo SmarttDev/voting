@@ -2,7 +2,7 @@
 pragma solidity ^0.7.4;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./../node_modules/openzeppelin-solidity/contracts/access/Ownable.sol";
 
 /**
  * @title Voting contract
@@ -31,6 +31,7 @@ contract Voting is Ownable {
 
     mapping(address => Voter) public _voterlist;
 
+    address[] public _voterAddressList;
     Proposal[] public _proposallist;
     WorkflowStatus public _workflow;
 
@@ -68,6 +69,7 @@ contract Voting is Ownable {
             "This address is already registered"
         );
         _voterlist[_address].isRegistered = true;
+        _voterAddressList.push(_address);
         emit VoterRegistered(_address);
     }
 
@@ -224,5 +226,12 @@ contract Voting is Ownable {
             WorkflowStatus.VotingSessionEnded
         );
         emit VotingSessionEnded();
+    }
+
+    function getVoterAddressList() public view returns (address[] memory) {
+        return _voterAddressList;
+    }
+    function getProposals() public view returns (Proposal[] memory) {
+        return _proposallist;
     }
 }
