@@ -16,6 +16,15 @@ const RegisteringVoters = ({ contract, accounts }) => {
       });
   };
 
+  getVoters = async() => {
+    const { accounts, contract } = this.state;
+  
+    // récupérer la liste des comptes autorisés
+    const whitelist = await contract.methods.getAddresses().call();
+    // Mettre à jour le state 
+    this.setState({ whitelist: whitelist });
+  };
+
   const modalTitle = "Title voters";
   const modalContent = "Modal content voters";
   const closeModal = async (e) => {
