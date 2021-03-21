@@ -1,4 +1,5 @@
-const Modal = ({ title, content }) => {
+const Modal = ({ title, content, callbackClose }) => {
+
   return (
     <>
       <div class="fixed z-10 inset-0 overflow-y-auto" onClick={() => ""}>
@@ -39,7 +40,10 @@ const Modal = ({ title, content }) => {
                 className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
                 type="button"
                 style={{ transition: "all .15s ease" }}
-                onClick={() => ""}
+                onClick={() => {
+                  // console.log('callbake', callbackClose, props, title);
+                  callbackClose()
+                }}
               >
                 Close
               </button>

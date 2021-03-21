@@ -17,6 +17,10 @@ const ProposalStart = ({ owner, contract, accounts }) => {
   const modalTitle = "Title proposal";
   const modalContent = "Modal content proposal";
 
+  const closeModal = async (e) => {
+
+    setShowModal(false);
+  }
   return (
     <>
       <p className="text-indigo-600 font-bold">
@@ -61,7 +65,7 @@ const ProposalStart = ({ owner, contract, accounts }) => {
         )}
       </div>
 
-      {showModal && <Modal content={modalContent} title={modalTitle} />}
+      {showModal && <Modal content={modalContent} title={modalTitle} callbackClose={closeModal}/>}
     </>
   );
 };

@@ -18,7 +18,11 @@ const RegisteringVoters = ({ contract, accounts }) => {
 
   const modalTitle = "Title voters";
   const modalContent = "Modal content voters";
+  const closeModal = async (e) => {
 
+    // console.log('CloseModal');
+    setShowModal(false);
+  }
   return (
     <>
       <p className="text-indigo-600 font-bold">
@@ -59,7 +63,7 @@ const RegisteringVoters = ({ contract, accounts }) => {
           Démarrer les propositions
         </button>
       </div>
-      {showModal && <Modal content={modalContent} title={modalTitle} />}
+      {showModal && <Modal content={modalContent} title={modalTitle} callbackClose={closeModal} />}
     </>
   );
 };
