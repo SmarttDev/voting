@@ -2,48 +2,31 @@ import React, { useContext } from "react";
 import Web3Context from "context/Web3Context";
 import {
   RegisteringVoters,
-  Forbidden,
   ProposalStart,
   ProposalEnd,
   VotingStart,
   VotingEnd,
+  VotesTallied,
 } from "components/workflow";
 import WorkflowStatus from "workflowStatus";
 
 function App() {
-  const { web3, accounts, workflow, owner, votersAddress } = useContext(
-    Web3Context
-  );
+  const { web3, accounts, workflow } = useContext(Web3Context);
 
   const componentWorkflow = (param) => {
     switch (param) {
       case "RegisteringVoters":
-        return owner === accounts[0] ? (
-          <RegisteringVoters />
-        ) : (
-          <Forbidden
-            content="Connectez-vous avec l'adresse du popriétaire du contrat pour démarrer la
-        période de proposition"
-          />
-        );
+        return <RegisteringVoters />;
       case "ProposalsRegistrationStarted":
-        return votersAddress.indexOf(accounts[0]) !== -1 ? (
-          <ProposalStart />
-        ) : (
-          <Forbidden content="Vous n'êtes pas autorisé à enregistrer des propositions. Veuillez utiliser une adresse qui fait partie de la liste des adresses autorisées" />
-        );
+        return <ProposalStart />;
       case "ProposalsRegistrationEnded":
-        return votersAddress.indexOf(accounts[0]) !== -1 ? (
-          <ProposalEnd />
-        ) : (
-          <Forbidden content="Vous n'êtes pas autorisé à voter. Veuillez utiliser une adresse qui fait partie de la liste des adresses autorisées" />
-        );
+        return <ProposalEnd />;
       case "VotingSessionStarted":
         return <VotingStart />;
       case "VotingSessionEnded":
         return <VotingEnd />;
       case "VotesTallied":
-        return <></>;
+        return <VotesTallied />;
       default:
         <></>;
     }

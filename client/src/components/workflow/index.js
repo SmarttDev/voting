@@ -4,6 +4,7 @@ import ProposalStart from "./ProposalStart";
 import ProposalEnd from "./ProposalEnd";
 import VotingStart from "./VotingStart";
 import VotingEnd from "./VotingEnd";
+import VotesTallied from "./VotesTallied";
 
 export {
   RegisteringVoters,
@@ -12,4 +13,5 @@ export {
   ProposalEnd,
   VotingStart,
   VotingEnd,
+  VotesTallied,
 };

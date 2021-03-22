@@ -1,28 +1,26 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Web3Context from "context/Web3Context";
 import ProposalList from "components/ProposalList";
 import { Forbidden } from "components/workflow";
 import Modal from "components/Modal";
 import VotersAddress from "components/VotersAddress";
 
-const VotingStart = () => {
-  const { contract, accounts, setWorkflow, owner, votersAddress } = useContext(
-    Web3Context
-  );
+const VotesTallied = () => {
+  const { contract, accounts, owner, votersAddress } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
+  const [winner, setWinner] = useState(null);
 
-  contract.events
-    .WorkflowStatusChange()
-    .on("data", async (event) => {
-      setWorkflow(event.returnValues.newStatus);
-    })
-    .on("error", console.error);
+  useEffect(() => {
+    (async () => {
+      setWinner(await contract.methods.Winner().call());
+    })();
+  }, [contract]);
 
   return (
     <>
       {votersAddress.indexOf(accounts[0]) === -1 ? (
         <div>
-          <Forbidden content="Vous n'êtes pas autorisé à voter." />
+          <Forbidden content="Vous n'êtes pas autorisé à accéder à cette page." />
           <div>
             <span className="text-indigo-600">
               Veuillez utiliser une adresse qui fait partie de la liste des
@@ -32,7 +30,7 @@ const VotingStart = () => {
         </div>
       ) : (
         <div>
-          <ProposalList />
+          <ProposalList winner={winner} />
           <div className="flex justify-center space-x-4 mt-20">
             {owner === accounts[0] && (
               <>
@@ -45,15 +43,6 @@ const VotingStart = () => {
                   Voir la whitelist
                 </button>
 
-                <button
-                  type="button"
-                  onClick={async () =>
-                    await contract.methods.VoteEnd().send({ from: accounts[0] })
-                  }
-                  className="px-8 rounded-lg bg-red-600 text-white font-bold p-4 uppercase border-red-600 border-t border-b border-r"
-                >
-                  Clôturer les votes
-                </button>
                 {showModal && (
                   <Modal
                     content={<VotersAddress content={votersAddress} />}
@@ -70,4 +59,4 @@ const VotingStart = () => {
   );
 };
 
-export default VotingStart;
+export default VotesTallied;

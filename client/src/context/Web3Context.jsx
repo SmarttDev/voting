@@ -2,16 +2,45 @@ import { createContext, useState, useEffect } from "react";
 import getWeb3 from "lib/getWeb3";
 import SimpleStorageContract from "contracts/Voting.json";
 
-const Web3Context = createContext(null);
+const initState = {
+  web3: {},
+  accounts: [],
+  contract: {},
+  workflow: 0,
+  owner: null,
+  votersAddress: [],
+  proposalList: [],
+  voter: {},
+};
+
+const Web3Context = createContext();
 
 const Web3Provider = ({ children }) => {
-  const [web3, setWeb3] = useState({ eth: {} });
-  const [accounts, setAccounts] = useState([]);
-  const [contract, setContracts] = useState({ methods: {} });
-  const [workflow, setWorkflow] = useState(0);
-  const [owner, setOwner] = useState(0);
-  const [votersAddress, setVotersAddress] = useState([]);
-  const [proposalList, setProposalList] = useState([]);
+  const [state, setState] = useState(initState);
+
+  const setProposalList = (proposal) => {
+    setState({
+      ...state,
+      proposalList: [
+        ...state.proposalList,
+        { description: proposal, voteCount: 0 },
+      ],
+    });
+  };
+
+  const setVotersAddress = (voterAddress) => {
+    setState({
+      ...state,
+      votersAddress: [...state.votersAddress, voterAddress],
+    });
+  };
+
+  const setWorkflow = (workflow) => {
+    setState({
+      ...state,
+      workflow,
+    });
+  };
 
   useEffect(() => {
     (async () => {
@@ -30,15 +59,25 @@ const Web3Provider = ({ children }) => {
           deployedNetwork && deployedNetwork.address
         );
 
-        // Set web3, accounts, and contract to the state, and then proceed with an
-        // example of interacting with the contract's methods.
-        setWeb3(web3);
-        setAccounts(accounts);
-        setContracts(contract);
-        setWorkflow(await contract.methods._workflow().call());
-        setOwner(await contract.methods.owner().call());
-        setVotersAddress(await contract.methods.getVotersAddress().call());
-        setProposalList(await contract.methods.getProposalList().call());
+        setState({
+          web3,
+          accounts,
+          contract,
+          workflow: await contract.methods._workflow().call(),
+          owner: await contract.methods.owner().call(),
+          votersAddress: await contract.methods.getVotersAddress().call(),
+          proposalList: await contract.methods.getProposalList().call(),
+          voter: await contract.methods._voterlist(accounts[0]).call(),
+        });
+
+        window.ethereum.on("accountsChanged", (accounts) => {
+          console.log("accountsChanged");
+        });
+
+        window.ethereum.on("networkChanged", (networkId) => {
+          // Time to reload your interface with the new networkId
+          console.log("networkChange");
+        });
       } catch (error) {
         // Catch any errors for any of the above operations.
         alert(
@@ -47,22 +86,11 @@ const Web3Provider = ({ children }) => {
         console.error(error);
       }
     })();
-  }, []);
+  }, [children, state]);
 
   return (
     <Web3Context.Provider
-      value={{
-        web3,
-        accounts,
-        contract,
-        workflow,
-        setWorkflow,
-        owner,
-        votersAddress,
-        setVotersAddress,
-        proposalList,
-        setProposalList,
-      }}
+      value={{ ...state, setProposalList, setVotersAddress, setWorkflow }}
     >
       {children}
     </Web3Context.Provider>
