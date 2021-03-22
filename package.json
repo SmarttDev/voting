@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "start": "cd ./client && npm i && craco start"
+        "start": "node app.js"
     },
     "dependencies": {
         "@openzeppelin/contracts": "^3.4.1",
