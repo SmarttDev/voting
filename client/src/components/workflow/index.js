@@ -7,11 +7,11 @@ import VotingEnd from "./VotingEnd";
 import VotingTallied from "./VotingTallied";
 
 export {
-    RegisteringVoters,
-    Forbidden,
-    ProposalStart,
-    ProposalEnd,
-    VotingStart,
-    VotingEnd,
-    VotingTallied
+  RegisteringVoters,
+  Forbidden,
+  ProposalStart,
+  ProposalEnd,
+  VotingStart,
+  VotingEnd,
+  VotingTallied,
 };

@@ -6,7 +6,7 @@ import {
   ProposalEnd,
   VotingStart,
   VotingEnd,
-  VotingTallied
+  VotingTallied,
 } from "components/workflow";
 import WorkflowStatus from "workflowStatus";
 
