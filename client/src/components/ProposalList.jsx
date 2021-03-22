@@ -15,13 +15,14 @@ const ProposalList = ({ content, winnerProposal }) => {
             Les votes ne sont pas encore ouverts
           </span>
         )}
-        {workflow >= WorkflowStatus.indexOf("VotingSessionEnd") && (
-          <>
-            <span className="text-red-600">Les votes sont clôs</span>
-            <h1>
-              {`La proposition gagnante est : ${winnerProposal?.description} with ${winnerProposal?.voteCount} vote(s)`}
-            </h1>
-          </>
+        {parseInt(workflow) ===
+          WorkflowStatus.indexOf("VotingSessionEnded") && (
+          <span className="text-red-600">Les votes sont clôs</span>
+        )}
+        {parseInt(workflow) === WorkflowStatus.indexOf("VotesTallied") && (
+          <h1 className="text-yellow-600">
+            {`La proposition gagnante est : ${winnerProposal?.description} avec ${winnerProposal?.voteCount} vote(s)`}
+          </h1>
         )}
         {voter.hasVoted &&
           WorkflowStatus[workflow] === "VotingSessionStarted" && (
