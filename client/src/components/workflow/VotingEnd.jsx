@@ -43,7 +43,6 @@ const VotingEnd = () => {
   }, [])
   return (
     <>
-      {text}
       <button
           type="button"
           onClick={submitWinningProposal
@@ -54,7 +53,7 @@ const VotingEnd = () => {
           Désigner le gagnant
         </button>
       {/* <a onClick={submitWinningProposal}>Voir</a> */}
-      <h1> The winner is : {winnerProposal?.description} with {winnerProposal?.voteCount} vote(s)</h1>
+      {winnerProposal ? <h1> The winner is : {winnerProposal?.description} with {winnerProposal?.voteCount} vote(s)</h1>: ''}
     </>
   )
 };
