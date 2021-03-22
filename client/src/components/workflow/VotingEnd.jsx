@@ -1,61 +1,75 @@
+import { useContext, useState } from "react";
 import Web3Context from "context/Web3Context";
-import React, { useContext, useState, useEffect } from "react";
-// interface IWinnerProposal{
-//   description:string;
-//   voteCount:string;
-// }
+import ProposalList from "components/ProposalList";
+import { Forbidden } from "components/workflow";
+import Modal from "components/Modal";
+import VotersAddress from "components/VotersAddress";
+
 const VotingEnd = () => {
-  let status = 'VotingSessionEnded';
-  let text = 'Voting Session has Ended';
-  const { contract, accounts, setWorkflow, owner, proposalList } = useContext(
+  const { contract, accounts, setWorkflow, owner, votersAddress } = useContext(
     Web3Context
   );
-  const [winnerProposal, setWinnerProposal] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // await contract.methods.Winner().send({ from: accounts[0] })
-  const getWinner = async () => {
+  contract.events
+    .WorkflowStatusChange()
+    .on("data", async (event) => {
+      setWorkflow(event.returnValues.newStatus);
+    })
+    .on("error", console.error);
 
-    let winner = await contract.methods.Winner().call()
-    const _winnerProposal = {
-      description: winner.description,
-      voteCount: winner.voteCount,
-    }
-    setWinnerProposal(_winnerProposal)
-    console.log('winner', _winnerProposal);
-
-  }
-  const submitWinningProposal = async (e) => {
-    e.preventDefault();
-    await contract.methods
-      .WinningProposal()
-      .send({ from: accounts[0] }, async (error, tx) => {
-        if (tx) {
-          getWinner()
-        }
-        if (error) {
-          console.log(error);
-        }
-      });
-  };
-
-  useEffect(() => {
-   
-  }, [])
   return (
     <>
-      <button
-          type="button"
-          onClick={submitWinningProposal
-            // await contract.methods.ProposalStart().send({ from: accounts[0] })
-          }
-          className="px-8 rounded-lg bg-red-600 text-white font-bold p-4 uppercase border-red-600 border-t border-b border-r"
-        >
-          Désigner le gagnant
-        </button>
-      {/* <a onClick={submitWinningProposal}>Voir</a> */}
-      {winnerProposal ? <h1> The winner is : {winnerProposal?.description} with {winnerProposal?.voteCount} vote(s)</h1>: ''}
+      {votersAddress.indexOf(accounts[0]) === -1 ? (
+        <div>
+          <Forbidden content="Vous n'êtes pas autorisé à voter." />
+          <div>
+            <span className="text-indigo-600">
+              Veuillez utiliser une adresse qui fait partie de la liste des
+              adresses autorisées
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <ProposalList />
+          <div className="flex justify-center space-x-4 mt-20">
+            {owner === accounts[0] && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="px-8 rounded-lg bg-green-600 text-white font-bold p-4 uppercase border-green-600 border-t border-b border-r"
+                  style={{ transition: "all .15s ease" }}
+                >
+                  Voir la whitelist
+                </button>
+
+                <button
+                  type="button"
+                  onClick={async () =>
+                    await contract.methods
+                      .WinningProposal()
+                      .send({ from: accounts[0] })
+                  }
+                  className="px-8 rounded-lg bg-red-600 text-white font-bold p-4 uppercase border-red-600 border-t border-b border-r"
+                >
+                  Comptabiliser les votes
+                </button>
+                {showModal && (
+                  <Modal
+                    content={<VotersAddress content={votersAddress} />}
+                    title="Liste des votants"
+                    setShowModal={setShowModal}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
-  )
+  );
 };
 
 export default VotingEnd;

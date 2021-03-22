@@ -39,7 +39,7 @@ const Header = () => {
             </button>
             <a
               className="flex items-center mx-2 text-gray-800 hover:text-indigo-600"
-              href="https://github.com/Smarttdev/truffle-boxes"
+              href="https://github.com/Smarttdev/voting"
             >
               <svg
                 className="h-5 w-5 sm:h-6 sm:w-6 fill-current"

@@ -10,7 +10,7 @@ const Footer = () => {
           <div className="flex items-center -mx-2">
             <a
               className="flex items-center mx-2 text-gray-600 hover:text-indigo-600"
-              href="https://github.com/Smarttdev/truffle-boxes"
+              href="https://github.com/Smarttdev/voting"
             >
               <svg
                 className="h-5 w-5 fill-current"
