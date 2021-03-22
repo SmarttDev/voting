@@ -8,12 +8,19 @@ import VotersAddress from "components/VotersAddress";
 const VotesTallied = () => {
   const { contract, accounts, owner, votersAddress } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
-  const [winner, setWinner] = useState(null);
+  const [winnerProposal, setWinnerProposal] = useState(null);
 
   useEffect(() => {
-    (async () => {
-      setWinner(await contract.methods.Winner().call());
-    })();
+    const getWinner = async () => {
+      let winner = await contract.methods.Winner().call();
+      const _winnerProposal = {
+        description: winner.description,
+        voteCount: winner.voteCount,
+      };
+      setWinnerProposal(_winnerProposal);
+      console.log("winner", _winnerProposal);
+    };
+    getWinner();
   }, [contract]);
 
   return (
@@ -30,7 +37,7 @@ const VotesTallied = () => {
         </div>
       ) : (
         <div>
-          <ProposalList winner={winner} />
+          <ProposalList winnerProposal={winnerProposal} />
           <div className="flex justify-center space-x-4 mt-20">
             {owner === accounts[0] && (
               <>

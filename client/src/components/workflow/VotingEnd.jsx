@@ -18,6 +18,20 @@ const VotingEnd = () => {
     })
     .on("error", console.error);
 
+  const submitWinningProposal = async (e) => {
+    e.preventDefault();
+    await contract.methods
+      .WinningProposal()
+      .send({ from: accounts[0] }, async (error, tx) => {
+        if (tx) {
+          console.log(tx);
+        }
+        if (error) {
+          console.log(error);
+        }
+      });
+  };
+
   return (
     <>
       {votersAddress.indexOf(accounts[0]) === -1 ? (
@@ -47,11 +61,7 @@ const VotingEnd = () => {
 
                 <button
                   type="button"
-                  onClick={async () =>
-                    await contract.methods
-                      .WinningProposal()
-                      .send({ from: accounts[0] })
-                  }
+                  onClick={submitWinningProposal}
                   className="px-8 rounded-lg bg-red-600 text-white font-bold p-4 uppercase border-red-600 border-t border-b border-r"
                 >
                   Comptabiliser les votes

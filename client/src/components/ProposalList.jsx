@@ -2,7 +2,7 @@ import { useContext } from "react";
 import Web3Context from "context/Web3Context";
 import WorkflowStatus from "workflowStatus";
 
-const ProposalList = ({ content, winner }) => {
+const ProposalList = ({ content, winnerProposal }) => {
   const { contract, accounts, workflow, voter, proposalList } = useContext(
     Web3Context
   );
@@ -16,7 +16,12 @@ const ProposalList = ({ content, winner }) => {
           </span>
         )}
         {workflow >= WorkflowStatus.indexOf("VotingSessionEnd") && (
-          <span className="text-red-600">Les votes sont clôs</span>
+          <>
+            <span className="text-red-600">Les votes sont clôs</span>
+            <h1>
+              {`La proposition gagnante est : ${winnerProposal?.description} with ${winnerProposal?.voteCount} vote(s)`}
+            </h1>
+          </>
         )}
         {voter.hasVoted &&
           WorkflowStatus[workflow] === "VotingSessionStarted" && (
@@ -50,8 +55,8 @@ const ProposalList = ({ content, winner }) => {
                   WorkflowStatus[workflow] === "VotingSessionStarted"
                     ? "bg-green-100"
                     : WorkflowStatus[workflow] === "VotesTallied" &&
-                      winner &&
-                      winner["description"] === p.description
+                      winnerProposal &&
+                      winnerProposal["description"] === p.description
                     ? "bg-yellow-200"
                     : "";
 

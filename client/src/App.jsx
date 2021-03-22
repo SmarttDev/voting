@@ -6,7 +6,7 @@ import {
   ProposalEnd,
   VotingStart,
   VotingEnd,
-  VotesTallied,
+  VotingTallied,
 } from "components/workflow";
 import WorkflowStatus from "workflowStatus";
 
@@ -26,7 +26,7 @@ function App() {
       case "VotingSessionEnded":
         return <VotingEnd />;
       case "VotesTallied":
-        return <VotesTallied />;
+        return <VotingTallied />;
       default:
         <></>;
     }
@@ -41,6 +41,7 @@ function App() {
               Voting Dapp
             </h1>
             <div className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-3xl sm:mx-auto md:mt-5 md:text-xl">
+              {/* {WorkflowStatus[workflow]} */}
               {accounts.length ? (
                 componentWorkflow(WorkflowStatus[workflow])
               ) : (
