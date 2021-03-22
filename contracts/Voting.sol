@@ -2,7 +2,8 @@
 pragma solidity ^0.7.4;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+import "./../node_modules/openzeppelin-solidity/contracts/access/Ownable.sol";
 
 /**
  * @title Voting contract
