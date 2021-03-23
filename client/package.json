@@ -16,7 +16,8 @@
         "tailwindcss": "npm:@tailwindcss/postcss7-compat"
     },
     "scripts": {
-        "start": "craco start",
+        "start": "node server/server.js",
+        "start:dev": "craco start",
         "build": "craco build",
         "test:front": "craco test",
         "test:contracts": "truffle test test/contracts/*.js --network develop",
@@ -44,6 +45,6 @@
         "@openzeppelin/test-helpers": "^0.5.10",
         "@tailwindcss/postcss7-compat": "^2.0.4",
         "autoprefixer": "^9",
-        "postcss": "^7",
+        "postcss": "^7"
     }
 }

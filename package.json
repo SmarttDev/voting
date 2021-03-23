@@ -4,6 +4,7 @@
     },
     "dependencies": {
         "@openzeppelin/contracts": "^3.4.1",
+        "@truffle/hdwallet-provider": "1.0.18",
         "express": "^4.17.1",
         "openzeppelin-solidity": "^3.4.0"
     }
