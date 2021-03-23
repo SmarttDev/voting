@@ -53,7 +53,12 @@ const Web3Provider = ({ children }) => {
 
         // Get the contract instance.
         const networkId = await web3.eth.net.getId();
+        
+        if(networkId && networkId !=="3" ){
+          alert('Vous devez être connecté sur Ropsten')
+        }
         const deployedNetwork = SimpleStorageContract.networks[networkId];
+        // deployedNetwork.address = '0x36702042e208AfeAa84186C52C23Cb6De23553B9';
         const contract = new web3.eth.Contract(
           SimpleStorageContract.abi,
           deployedNetwork && deployedNetwork.address
