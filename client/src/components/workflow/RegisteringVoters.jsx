@@ -12,9 +12,10 @@ const RegisteringVoters = () => {
     setVotersAddress,
     setWorkflow,
     owner,
+    isAuthorised
   } = useContext(Web3Context);
   const [showModal, setShowModal] = useState(false);
-
+  const [userIsAuthorised, setUserIsAuthorised] = useState(false);
   contract.events
     .WorkflowStatusChange()
     .on("data", async (event) => {
@@ -38,13 +39,18 @@ const RegisteringVoters = () => {
         }
       });
   };
+  
+  const checkIfUserIsAuthorised = () => {
+    return votersAddress.indexOf(accounts[0]) === -1;
+  }
 
   return (
     <>
+    {votersAddress.indexOf(accounts[0]) }
       {accounts[0] === owner ? (
         <>
           <p className="text-indigo-600 font-bold">
-            La période d'inscription des votants est ouverte
+            La période d'inscription des votants est ouverte {userIsAuthorised}*
           </p>
           <form className="mt-6" onSubmit={submitRegisterVoter}>
             <input
@@ -97,6 +103,8 @@ const RegisteringVoters = () => {
           <Forbidden content="Vous n'êtes pas autorisé à accéder à cette page." />
           <div>
             <span className="text-indigo-600">
+            {/* **{accounts[0]} + {userIsAuthorised}** {votersAddress} */}
+
               {votersAddress.indexOf(accounts[0]) === -1
                 ? "Veuillez utiliser une adresse qui fait partie de la liste des adresses autorisées"
                 : "La période d'inscription des propositions n'est pas encore ouverte"}

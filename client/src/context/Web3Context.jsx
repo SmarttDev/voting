@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import getWeb3 from "lib/getWeb3";
-import SimpleStorageContract from "contracts/Voting.json";
+import VotingContract from "contracts/Voting.json";
 
 const initState = {
   web3: {},
@@ -11,6 +11,7 @@ const initState = {
   votersAddress: [],
   proposalList: [],
   voter: {},
+  isAuthorised:false
 };
 
 const Web3Context = createContext();
@@ -25,6 +26,12 @@ const Web3Provider = ({ children }) => {
         ...state.proposalList,
         { description: proposal, voteCount: 0 },
       ],
+    });
+  };
+  const setContract = (contract) => {
+    setState({
+      ...state,
+      contract: contract,
     });
   };
 
@@ -42,29 +49,70 @@ const Web3Provider = ({ children }) => {
     });
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        // Get network provider and web3 instance.
-        const web3 = await getWeb3();
+  const createContractInstance = (web3, fromAccount) => {
+    let abiContract = VotingContract.abi;
+    let byteCodeContract = VotingContract.bytecode;
+    // const accounts = await web3.eth.getAccounts();
 
-        // Use web3 to get the user's accounts.
-        const accounts = await web3.eth.getAccounts();
+    return new Promise(resolve => {
 
-        // Get the contract instance.
-        const networkId = await web3.eth.net.getId();
-        
-        if(networkId && networkId !=="3" ){
-          alert('Vous devez être connecté sur Ropsten')
-        }
-        const deployedNetwork = SimpleStorageContract.networks[networkId];
-        // deployedNetwork.address = '0x36702042e208AfeAa84186C52C23Cb6De23553B9';
-        const contract = new web3.eth.Contract(
-          SimpleStorageContract.abi,
-          deployedNetwork && deployedNetwork.address
+      if (localStorage.getItem('deployedContractAddress') && localStorage.getItem('deployedContractAddress') !== "") {
+        console.log('exists', localStorage.getItem('deployedContractAddress'), fromAccount);
+        resolve(localStorage.getItem('deployedContractAddress'));
+        return;
+      }
+      let payload = {
+        data: byteCodeContract,
+        // arguments: [200000000000, "COUCOU"]
+      }
+      let myContract = new web3.eth.Contract(abiContract, null, {
+        from: fromAccount, // default from address
+        gasPrice: '20000000000' // default gas price in wei, 20 gwei in this case
+      });
+      let parameter = {
+        from: fromAccount, // default from address
+        // gas: web3.utils.toHex(800000).toString(),
+        gasPrice: web3.utils.toHex(web3.utils.toWei('30', 'gwei')).toString()
+      }
+      console.log('check before send', payload, parameter);
+      myContract.deploy(payload).send(parameter, (err, transactionHash) => {
+        console.log('Transaction Hash :', transactionHash);
+      }).on('confirmation', () => { }).then((newContractInstance) => {
+        console.log('Deployed Contract Address : ', newContractInstance.options.address);
+        localStorage.setItem('deployedContractAddress', newContractInstance.options.address);
+
+        resolve(newContractInstance.options.address)
+      })
+    })
+  };
+  // const checkIfUserIsAuthorised = () => {
+  //   return votersAddress.indexOf(accounts[0]) === -1;
+  // }
+
+  const getContextState = async () => {
+    console.log('getContextState');
+    // return true
+    return new Promise(async (resolve)=>{
+
+      const web3 = await getWeb3();
+      // this.web3 = web3;
+      // Use web3 to get the user's accounts.
+      const accounts = await web3.eth.getAccounts();
+      // Get the contract instance.
+      const networkId = await web3.eth.net.getId();
+      const deployedContract = await createContractInstance(web3, accounts[0]);
+      // setContract(deployedContract);
+      if (networkId && networkId !== "5777") {
+        console.log('Vous devez être connecté sur Ganache !')
+      }
+      const deployedNetwork = VotingContract.networks[networkId];
+      // deployedNetwork.address = '0x36702042e208AfeAa84186C52C23Cb6De23553B9';
+      const contract = new web3.eth.Contract(
+        VotingContract.abi,
+        deployedContract
         );
-
-        setState({
+        
+        const loadedState = {
           web3,
           accounts,
           contract,
@@ -73,10 +121,32 @@ const Web3Provider = ({ children }) => {
           votersAddress: await contract.methods.getVotersAddress().call(),
           proposalList: await contract.methods.getProposalList().call(),
           voter: await contract.methods._voterlist(accounts[0]).call(),
-        });
+        }
+        loadedState.isAuthorised = loadedState.votersAddress.indexOf(accounts[0]) !== -1;
+        console.log('getContextState++loadedState', loadedState);
 
-        window.ethereum.on("accountsChanged", (accounts) => {
-          console.log("accountsChanged");
+        return resolve(loadedState);
+      })
+  }
+  useEffect(() => {
+    (async () => {
+      try {
+        // Get network provider and web3 instance.
+        const loadedState = await getContextState();
+      
+    
+
+        setState(loadedState);
+
+        window.ethereum.on("accountsChanged", async (accounts) => {
+          console.log('accoutn cha')
+          // let newState = Object.assign({ accounts: accounts }, this.state);
+          // loadedState.voter = await loadedState.contract.methods._voterlist(accounts[0]).call();
+          const loadedState = await getContextState();
+          
+          console.log("accountsChanged", state, loadedState);
+          // setState(loadedState)
+          setState(state => ({ ...state, loadedState }))
         });
 
         window.ethereum.on("networkChanged", (networkId) => {
@@ -91,7 +161,7 @@ const Web3Provider = ({ children }) => {
         console.error(error);
       }
     })();
-  }, [children, state]);
+  }, [children, state, getContextState]);
 
   return (
     <Web3Context.Provider
