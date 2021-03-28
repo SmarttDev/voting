@@ -1,3 +1,4 @@
 node_modules
 contracts/@openzeppelin
 client/src/contracts/*
+.secret

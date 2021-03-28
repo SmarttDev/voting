@@ -43,7 +43,7 @@ const ProposalList = ({ content, winnerProposal }) => {
                     {voter.hasVoted ? "" : "Actions"}
                   </th>
                 )}
-                {workflow >= WorkflowStatus.indexOf("VotingSessionEnd") && (
+                {workflow >= WorkflowStatus.indexOf("VotesTallied") && (
                   <th className="py-3 px-6 text-center">Résultats</th>
                 )}
               </tr>
@@ -93,7 +93,7 @@ const ProposalList = ({ content, winnerProposal }) => {
                         </div>
                       </td>
                     )}
-                    {workflow >= WorkflowStatus.indexOf("VotingSessionEnd") && (
+                    {workflow >= WorkflowStatus.indexOf("VotesTallied") && (
                       <td className="py-3 px-6 text-center">
                         <div className="flex item-center justify-center">
                           {p.voteCount}
