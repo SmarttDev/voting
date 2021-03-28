@@ -1,9 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.4;
+pragma solidity 0.7.4;
 pragma experimental ABIEncoderV2;
-
-// import "@openzeppelin/contracts/access/Ownable.sol";
-import "./../node_modules/openzeppelin-solidity/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title Voting contract
@@ -37,7 +35,7 @@ contract Voting is Ownable {
     WorkflowStatus public _workflow;
 
     uint16 public proposalId = 0;
-    uint16 private _winningProposalId;
+    uint16 public _winningProposalId = 0;
 
     event VoterRegistered(address voterAddress);
     event ProposalsRegistrationStarted();
@@ -87,6 +85,10 @@ contract Voting is Ownable {
         return _proposallist;
     }
 
+    function getStatus() public view returns (WorkflowStatus) {
+        return _workflow;
+    }
+
     /**
      * @dev Register a new proposal
      * @param _description The proposal description
@@ -118,6 +120,8 @@ contract Voting is Ownable {
             _voterlist[msg.sender].hasVoted == false,
             "The voter has already voted"
         );
+
+        require(_proposalId < proposalId, "The proposition does not exist!");
         _proposallist[_proposalId].voteCount++;
 
         _voterlist[msg.sender].votedProposalId = _proposalId;
@@ -166,18 +170,6 @@ contract Voting is Ownable {
     }
 
     /**
-     * @dev Get proposal by id
-     * @return Proposal proposal
-     */
-    function GetProposal(uint16 _proposalId)
-        public
-        view
-        returns (Proposal memory)
-    {
-        return _proposallist[_proposalId];
-    }
-
-    /**
      * @dev Start proposal period
      */
     function ProposalStart() public onlyOwner {
@@ -200,7 +192,7 @@ contract Voting is Ownable {
     function ProposalEnd() public onlyOwner {
         require(
             _workflow == WorkflowStatus.ProposalsRegistrationStarted,
-            "The status is not correct : Must be VotingSessionEnded"
+            "The status is not correct : Must be ProposalsRegistrationStarted"
         );
         _workflow = WorkflowStatus.ProposalsRegistrationEnded;
         emit WorkflowStatusChange(
@@ -232,7 +224,7 @@ contract Voting is Ownable {
     function VoteEnd() public onlyOwner {
         require(
             _workflow == WorkflowStatus.VotingSessionStarted,
-            "The status is not correct : Must be VotingSessionEnded"
+            "The status is not correct : Must be VotingSessionStarted"
         );
         _workflow = WorkflowStatus.VotingSessionEnded;
         emit WorkflowStatusChange(

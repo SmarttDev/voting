@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import getWeb3 from "lib/getWeb3";
-import SimpleStorageContract from "contracts/Voting.json";
+import VotingContract from "contracts/Voting.json";
 
 const initState = {
   web3: {},
@@ -53,9 +53,9 @@ const Web3Provider = ({ children }) => {
 
         // Get the contract instance.
         const networkId = await web3.eth.net.getId();
-        const deployedNetwork = SimpleStorageContract.networks[networkId];
+        const deployedNetwork = VotingContract.networks[networkId];
         const contract = new web3.eth.Contract(
-          SimpleStorageContract.abi,
+          VotingContract.abi,
           deployedNetwork && deployedNetwork.address
         );
 
